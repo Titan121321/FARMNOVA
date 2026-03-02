@@ -38,20 +38,22 @@ document.getElementById('logoutBtn').addEventListener('click', function() {
 
 function simulateAllSensors() {
     for (let i = 1; i <= 9; i++) {
-        let targetElement = document.getElementById('s' + i + '-val');
+        let readingElement = document.getElementById('s' + i + '-val');
+        let desiredElement = document.getElementById('s' + i + '-desired');
         
-        if (targetElement) {
-            // Find the <h3> title above this reading to check for a desired value
-            let titleElement = targetElement.previousElementSibling;
+        if (readingElement && desiredElement) {
+            // 1. Simulate the live reading
+            let randomValue = Math.floor(Math.random() * (99 - 10 + 1)) + 10;
+            readingElement.textContent = "Reading: " + randomValue;
+            
+            // 2. Fetch and display the desired value below it
+            let titleElement = readingElement.previousElementSibling;
             let savedDesired = titleElement.dataset.desired;
             
             if (savedDesired && savedDesired !== "") {
-                // If a desired value is set, display it permanently
-                targetElement.textContent = "Reading: " + savedDesired;
+                desiredElement.textContent = "Desired: " + savedDesired;
             } else {
-                // If NO desired value is set, simulate a random reading
-                let randomValue = Math.floor(Math.random() * (99 - 10 + 1)) + 10;
-                targetElement.textContent = "Reading: " + randomValue;
+                desiredElement.textContent = "Desired: --";
             }
         }
     }
@@ -139,27 +141,26 @@ saveBtn.addEventListener('click', () => {
     // --- ROUND FLOAT TO INTEGER LOGIC ---
     let rawDesiredValue = desiredInput.value;
     
-    // Check if the input is not empty
     if (rawDesiredValue !== "") {
         let floatVal = parseFloat(rawDesiredValue);
         
-        // If it successfully parses as a number, round it
         if (!isNaN(floatVal)) {
             rawDesiredValue = Math.round(floatVal).toString();
         } else {
-            rawDesiredValue = ""; // Failsafe if user somehow bypassed input rules
+            rawDesiredValue = ""; 
         }
     }
     
-    // Save the rounded integer to the card's data
+    // Save to the card's data
     activeCardTitle.dataset.desired = rawDesiredValue;
     
-    // Immediately update the reading display right when Apply is clicked
-    const readingDisplay = activeCardTitle.nextElementSibling;
+    // Immediately display the updated desired value below the reading
+    const desiredDisplay = activeCardTitle.parentElement.querySelector('.desired-display');
     if (rawDesiredValue !== "") {
-        readingDisplay.textContent = "Reading: " + rawDesiredValue;
+        desiredDisplay.textContent = "Desired: " + rawDesiredValue;
+    } else {
+        desiredDisplay.textContent = "Desired: --";
     }
-    // ------------------------------------
 
     // Save output pin
     activeCardTitle.dataset.pin = pinSelect.value;

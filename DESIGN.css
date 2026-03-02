@@ -210,6 +210,14 @@
     color: #718096;
 }
 
+/* NEW: Style for the desired value line */
+.desired-display {
+    font-size: 0.85rem !important;
+    color: #4a5568 !important;
+    font-weight: 600;
+    margin-top: 3px;
+}
+
 .border-blue   { border-left: 6px solid #3182ce; }
 .border-orange { border-left: 6px solid #dd6b20; }
 .border-purple { border-left: 6px solid #805ad5; }
