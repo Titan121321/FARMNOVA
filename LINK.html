@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FARMNOVA - Sensor Dashboard</title>
+    <link rel="stylesheet" href="DESIGN.css">
+</head>
+<body>
+
+    <div id="login-section">
+        <div class="login-wrapper">
+            <h1 class="main-title">FARMNOVA</h1>
+            
+            <div class="login-box">
+                <div class="login-content">
+                    <h2 class="login-subtitle">LOGIN</h2>
+                    
+                    <form id="loginForm">
+                        <div class="input-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" placeholder="Enter your username" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" placeholder="Enter your password" required>
+                        </div>
+                        
+                        <button type="submit" class="login-btn">Access Dashboard</button>
+                        <p id="errorMessage" class="error-message"></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboard-section" style="display: none;">
+        <div class="dashboard-wrapper">
+            <header class="dashboard-header">
+                <div>
+                    <h1>FARMNOVA</h1>
+                    <p>Live ESP32 Sensor Network</p>
+                </div>
+                <button id="logoutBtn" class="logout-btn">Logout</button>
+            </header>
+
+            <div class="grid-container">
+                <div class="card border-blue">
+                    <div class="icon-box">📡</div>
+                    <div class="card-text">
+                        <h3>Sensor 1</h3>
+                        <p id="s1-val">Loading...</p>
+                    </div>
+                </div>
+                <div class="card border-orange">
+                    <div class="icon-box">📡</div>
+                    <div class="card-text">
+                        <h3>Sensor 2</h3>
+                        <p id="s2-val">Loading...</p>
+                    </div>
+                </div>
+                <div class="card border-purple">
+                    <div class="icon-box">📡</div>
+                    <div class="card-text">
+                        <h3>Sensor 3</h3>
+                        <p id="s3-val">Loading...</p>
+                    </div>
+                </div>
+
+                <div class="card border-green">
+                    <div class="icon-box">📡</div>
+                    <div class="card-text">
+                        <h3>Sensor 4</h3>
+                        <p id="s4-val">Loading...</p>
+                    </div>
+                </div>
+                <div class="card border-red">
+                    <div class="icon-box">📡</div>
+                    <div class="card-text">
+                        <h3>Sensor 5</h3>
+                        <p id="s5-val">Loading...</p>
+                    </div>
+                </div>
+                <div class="card border-cyan">
+                    <div class="icon-box">📡</div>
+                    <div class="card-text">
+                        <h3>Sensor 6</h3>
+                        <p id="s6-val">Loading...</p>
+                    </div>
+                </div>
+
+                <div class="card border-yellow">
+                    <div class="icon-box">📡</div>
+                    <div class="card-text">
+                        <h3>Sensor 7</h3>
+                        <p id="s7-val">Loading...</p>
+                    </div>
+                </div>
+                <div class="card border-pink">
+                    <div class="icon-box">📡</div>
+                    <div class="card-text">
+                        <h3>Sensor 8</h3>
+                        <p id="s8-val">Loading...</p>
+                    </div>
+                </div>
+                <div class="card border-teal">
+                    <div class="icon-box">📡</div>
+                    <div class="card-text">
+                        <h3>Sensor 9</h3>
+                        <p id="s9-val">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sensorModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3>Assign Sensor</h3>
+            <div class="input-group">
+                <label for="sensorType">Type</label>
+                <select id="sensorType">
+                    <option value="" disabled selected>Select a sensor type...</option>
+                    <option value="SOIL MOISTURE">SOIL MOISTURE</option>
+                    <option value="DHT22">DHT22</option>
+                    <option value="MQ135">MQ135</option>
+                    <option value="LDR">LDR</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button id="cancelModalBtn" class="cancel-btn">Cancel</button>
+                <button id="saveModalBtn" class="save-btn">Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="SCRIPT.js"></script>
+</body>
+</html>
