@@ -307,9 +307,8 @@ input:checked + .slider:before {
     font-size: 1.4rem;
 }
 
-/* Updated to style both the select drop-down and the new text input identically */
 .modal-content select,
-.modal-content input[type="text"] {
+.modal-content input[type="number"] {
     width: 100%;
     padding: 12px;
     border: 1px solid #aaa;
@@ -322,9 +321,14 @@ input:checked + .slider:before {
 .modal-content select { cursor: pointer; }
 
 .modal-content select:focus,
-.modal-content input[type="text"]:focus {
+.modal-content input[type="number"]:focus {
     outline: none;
     border-color: #2c7a3f;
+}
+
+.modal-content select option:disabled {
+    color: #a0aec0;
+    background-color: #f0f4f8;
 }
 
 .modal-actions {

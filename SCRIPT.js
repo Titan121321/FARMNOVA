@@ -33,16 +33,26 @@ document.getElementById('logoutBtn').addEventListener('click', function() {
 });
 
 // =========================================
-// SENSOR DATA SIMULATION
+// SENSOR DATA SIMULATION & DISPLAY LOGIC
 // =========================================
 
 function simulateAllSensors() {
     for (let i = 1; i <= 9; i++) {
-        let randomValue = Math.floor(Math.random() * (99 - 10 + 1)) + 10;
         let targetElement = document.getElementById('s' + i + '-val');
         
         if (targetElement) {
-            targetElement.textContent = "Reading: " + randomValue;
+            // Find the <h3> title above this reading to check for a desired value
+            let titleElement = targetElement.previousElementSibling;
+            let savedDesired = titleElement.dataset.desired;
+            
+            if (savedDesired && savedDesired !== "") {
+                // If a desired value is set, display it permanently
+                targetElement.textContent = "Reading: " + savedDesired;
+            } else {
+                // If NO desired value is set, simulate a random reading
+                let randomValue = Math.floor(Math.random() * (99 - 10 + 1)) + 10;
+                targetElement.textContent = "Reading: " + randomValue;
+            }
         }
     }
 }
@@ -56,7 +66,8 @@ setInterval(simulateAllSensors, 3000);
 const cards = document.querySelectorAll('.card');
 const modal = document.getElementById('sensorModal');
 const typeSelect = document.getElementById('sensorType');
-const desiredInput = document.getElementById('sensorDesired'); // New desired value textbox
+const desiredInput = document.getElementById('sensorDesired');
+const pinSelect = document.getElementById('sensorPin');
 const saveBtn = document.getElementById('saveModalBtn');
 const cancelBtn = document.getElementById('cancelModalBtn');
 
@@ -75,12 +86,29 @@ cards.forEach(card => {
     card.addEventListener('click', function() {
         activeCardTitle = this.querySelector('h3');
         
-        // Reset the drop-down (or restore it if you want)
         typeSelect.value = activeCardTitle.dataset.assigned || "";
-        
-        // Restore the previously saved desired value for this specific card
         desiredInput.value = activeCardTitle.dataset.desired || "";
         
+        // Output Pin Logic (Grey out used pins)
+        const allTitles = document.querySelectorAll('.card h3');
+        const usedPins = [];
+        
+        allTitles.forEach(title => {
+            if (title !== activeCardTitle && title.dataset.pin) {
+                usedPins.push(title.dataset.pin);
+            }
+        });
+
+        Array.from(pinSelect.options).forEach(option => {
+            if (option.value === "") return; 
+            if (usedPins.includes(option.value)) {
+                option.disabled = true; 
+            } else {
+                option.disabled = false; 
+            }
+        });
+        
+        pinSelect.value = activeCardTitle.dataset.pin || "";
         modal.style.display = 'flex';
     });
 });
@@ -89,30 +117,52 @@ cards.forEach(card => {
 const sensorToggles = document.querySelectorAll('.sensor-toggle');
 sensorToggles.forEach(toggle => {
     toggle.addEventListener('change', function() {
-        // Toggle behavior maintains the assigned name without resetting
+        // Maintained without resetting
     });
 });
 
-// 4. Listen for the Cancel button on the modal
+// 4. Listen for the Cancel button
 cancelBtn.addEventListener('click', () => {
     modal.style.display = 'none';
 });
 
-// 5. Listen for the Apply/Save button on the modal
+// 5. Listen for the Apply/Save button
 saveBtn.addEventListener('click', () => {
+    // Save Sensor Type & Toggle
     if (typeSelect.value !== "") {
-        // Save the drop-down selection
         activeCardTitle.dataset.assigned = typeSelect.value;
-        
-        // Find and turn ON the toggle switch
         const toggle = activeCardTitle.closest('.card').querySelector('.sensor-toggle');
         toggle.checked = true;
-        
         activeCardTitle.textContent = typeSelect.value;
     }
     
-    // Save the text typed into the Desired Value textbox
-    activeCardTitle.dataset.desired = desiredInput.value;
+    // --- ROUND FLOAT TO INTEGER LOGIC ---
+    let rawDesiredValue = desiredInput.value;
+    
+    // Check if the input is not empty
+    if (rawDesiredValue !== "") {
+        let floatVal = parseFloat(rawDesiredValue);
+        
+        // If it successfully parses as a number, round it
+        if (!isNaN(floatVal)) {
+            rawDesiredValue = Math.round(floatVal).toString();
+        } else {
+            rawDesiredValue = ""; // Failsafe if user somehow bypassed input rules
+        }
+    }
+    
+    // Save the rounded integer to the card's data
+    activeCardTitle.dataset.desired = rawDesiredValue;
+    
+    // Immediately update the reading display right when Apply is clicked
+    const readingDisplay = activeCardTitle.nextElementSibling;
+    if (rawDesiredValue !== "") {
+        readingDisplay.textContent = "Reading: " + rawDesiredValue;
+    }
+    // ------------------------------------
+
+    // Save output pin
+    activeCardTitle.dataset.pin = pinSelect.value;
     
     modal.style.display = 'none';
 });
