@@ -50,46 +50,62 @@ function simulateAllSensors() {
 setInterval(simulateAllSensors, 3000);
 
 // =========================================
-// MODAL / POP-UP LOGIC
+// MODAL & TOGGLE SWITCH LOGIC
 // =========================================
 
-// Grab the elements needed for the pop-up
 const cards = document.querySelectorAll('.card');
 const modal = document.getElementById('sensorModal');
 const typeSelect = document.getElementById('sensorType');
 const saveBtn = document.getElementById('saveModalBtn');
 const cancelBtn = document.getElementById('cancelModalBtn');
 
-let activeCardTitle = null; // This will remember which card we clicked on
+let activeCardTitle = null; 
 
-// 1. Listen for clicks on EVERY card in the grid
+// 1. Prevent clicking the toggle switch from opening the modal
+const toggleContainers = document.querySelectorAll('.toggle-container');
+toggleContainers.forEach(container => {
+    container.addEventListener('click', function(event) {
+        event.stopPropagation(); // Stops the click from registering on the card behind it
+    });
+});
+
+// 2. Listen for clicks on the cards to open the modal
 cards.forEach(card => {
     card.addEventListener('click', function() {
-        // Find the <h3> element specifically inside the card that was clicked
         activeCardTitle = this.querySelector('h3');
-        
-        // Reset the dropdown back to default empty state
         typeSelect.value = "";
-        
-        // Show the modal
         modal.style.display = 'flex';
     });
 });
 
-// 2. Listen for the Cancel button
+// 3. Handle toggling ON and OFF
+const sensorToggles = document.querySelectorAll('.sensor-toggle');
+sensorToggles.forEach(toggle => {
+    toggle.addEventListener('change', function() {
+        // The visual change (Green/Grey) is handled entirely by your CSS.
+        // We removed the code that reverted the title text here.
+        // Now, flipping the switch leaves the selected option exactly as it is!
+    });
+});
+
+// 4. Listen for the Cancel button on the modal
 cancelBtn.addEventListener('click', () => {
-    // Hide the modal without making changes
     modal.style.display = 'none';
 });
 
-// 3. Listen for the Apply/Save button
+// 5. Listen for the Apply/Save button on the modal
 saveBtn.addEventListener('click', () => {
-    // If the user actually selected a dropdown option
     if (typeSelect.value !== "") {
-        // Change the text of the previously clicked card's title
+        // Save the selection in the background
+        activeCardTitle.dataset.assigned = typeSelect.value;
+        
+        // Find the toggle switch for this specific card
+        const toggle = activeCardTitle.closest('.card').querySelector('.sensor-toggle');
+        
+        // Automatically turn the toggle ON and update the text so the user sees their change
+        toggle.checked = true;
         activeCardTitle.textContent = typeSelect.value;
     }
     
-    // Hide the modal after saving
     modal.style.display = 'none';
 });
