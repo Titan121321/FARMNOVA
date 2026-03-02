@@ -228,10 +228,10 @@
 }
 
 /* ========================================= */
-/* NEW: TOGGLE SWITCH STYLES                 */
+/* TOGGLE SWITCH STYLES                      */
 /* ========================================= */
 .toggle-container {
-    margin-left: auto; /* Pushes the toggle to the far right */
+    margin-left: auto; 
     position: relative;
     display: inline-block;
     width: 48px;
@@ -249,7 +249,7 @@
     position: absolute;
     cursor: pointer;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #a0aec0; /* Grey color when OFF */
+    background-color: #a0aec0; 
     transition: .4s;
 }
 
@@ -265,20 +265,15 @@
 }
 
 input:checked + .slider {
-    background-color: #38a169; /* Green color when ON */
+    background-color: #38a169; 
 }
 
 input:checked + .slider:before {
     transform: translateX(22px);
 }
 
-.slider.round {
-    border-radius: 34px;
-}
-
-.slider.round:before {
-    border-radius: 50%;
-}
+.slider.round { border-radius: 34px; }
+.slider.round:before { border-radius: 50%; }
 
 /* ========================================= */
 /* MODAL / POP-UP STYLES                     */
@@ -312,7 +307,9 @@ input:checked + .slider:before {
     font-size: 1.4rem;
 }
 
-.modal-content select {
+/* Updated to style both the select drop-down and the new text input identically */
+.modal-content select,
+.modal-content input[type="text"] {
     width: 100%;
     padding: 12px;
     border: 1px solid #aaa;
@@ -320,10 +317,12 @@ input:checked + .slider:before {
     font-size: 1rem;
     margin-bottom: 25px;
     background-color: #f9f9f9;
-    cursor: pointer;
 }
 
-.modal-content select:focus {
+.modal-content select { cursor: pointer; }
+
+.modal-content select:focus,
+.modal-content input[type="text"]:focus {
     outline: none;
     border-color: #2c7a3f;
 }
@@ -344,15 +343,7 @@ input:checked + .slider:before {
     font-size: 1rem;
 }
 
-.cancel-btn {
-    background-color: #e2e8f0;
-    color: #4a5568;
-}
-
-.save-btn {
-    background-color: #2c7a3f;
-    color: white;
-}
-
+.cancel-btn { background-color: #e2e8f0; color: #4a5568; }
+.save-btn { background-color: #2c7a3f; color: white; }
 .cancel-btn:hover { background-color: #cbd5e0; }
 .save-btn:hover { background-color: #1e5c2d; }

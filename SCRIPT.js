@@ -56,6 +56,7 @@ setInterval(simulateAllSensors, 3000);
 const cards = document.querySelectorAll('.card');
 const modal = document.getElementById('sensorModal');
 const typeSelect = document.getElementById('sensorType');
+const desiredInput = document.getElementById('sensorDesired'); // New desired value textbox
 const saveBtn = document.getElementById('saveModalBtn');
 const cancelBtn = document.getElementById('cancelModalBtn');
 
@@ -65,7 +66,7 @@ let activeCardTitle = null;
 const toggleContainers = document.querySelectorAll('.toggle-container');
 toggleContainers.forEach(container => {
     container.addEventListener('click', function(event) {
-        event.stopPropagation(); // Stops the click from registering on the card behind it
+        event.stopPropagation();
     });
 });
 
@@ -73,7 +74,13 @@ toggleContainers.forEach(container => {
 cards.forEach(card => {
     card.addEventListener('click', function() {
         activeCardTitle = this.querySelector('h3');
-        typeSelect.value = "";
+        
+        // Reset the drop-down (or restore it if you want)
+        typeSelect.value = activeCardTitle.dataset.assigned || "";
+        
+        // Restore the previously saved desired value for this specific card
+        desiredInput.value = activeCardTitle.dataset.desired || "";
+        
         modal.style.display = 'flex';
     });
 });
@@ -82,9 +89,7 @@ cards.forEach(card => {
 const sensorToggles = document.querySelectorAll('.sensor-toggle');
 sensorToggles.forEach(toggle => {
     toggle.addEventListener('change', function() {
-        // The visual change (Green/Grey) is handled entirely by your CSS.
-        // We removed the code that reverted the title text here.
-        // Now, flipping the switch leaves the selected option exactly as it is!
+        // Toggle behavior maintains the assigned name without resetting
     });
 });
 
@@ -96,16 +101,18 @@ cancelBtn.addEventListener('click', () => {
 // 5. Listen for the Apply/Save button on the modal
 saveBtn.addEventListener('click', () => {
     if (typeSelect.value !== "") {
-        // Save the selection in the background
+        // Save the drop-down selection
         activeCardTitle.dataset.assigned = typeSelect.value;
         
-        // Find the toggle switch for this specific card
+        // Find and turn ON the toggle switch
         const toggle = activeCardTitle.closest('.card').querySelector('.sensor-toggle');
-        
-        // Automatically turn the toggle ON and update the text so the user sees their change
         toggle.checked = true;
+        
         activeCardTitle.textContent = typeSelect.value;
     }
+    
+    // Save the text typed into the Desired Value textbox
+    activeCardTitle.dataset.desired = desiredInput.value;
     
     modal.style.display = 'none';
 });
