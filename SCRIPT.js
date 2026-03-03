@@ -1,9 +1,8 @@
 // =========================================
 // GOOGLE SHEETS API SETUP
 // =========================================
-const GOOGLE_APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw6lNiqIy3-78NriTNzetzLA_u_IxFu4aXlZeyTxm3vVikO_QHb5Yt9c_jbgDz1mzvB/exec"; // PASTE YOUR URL HERE
+const GOOGLE_APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzgBGo4ml7UWiXXyesRzgAeYB1bmV7XAUR2EdVU5PXlf10E64zGdh6vSmXMogrOEeXf/exec"; // PASTE YOUR URL HERE
 
-// Mapping table to convert text into numbers for Google Sheets
 const REVERSE_TYPE_MAP = { "LDR": 1, "Temperature": 2, "Humidity": 3, "MQ135": 4, "Soil Moisture": 5 };
 
 // =========================================
@@ -61,33 +60,32 @@ async function fetchLiveSensorData() {
         const data = await response.json(); 
         
         data.forEach(sensor => {
-            let targetReading = document.getElementById('s' + sensor.pin + '-val');
-            let targetDesired = document.getElementById('s' + sensor.pin + '-desired');
+            let cardElement = document.querySelector(`h3[data-id="${sensor.pin}"]`);
+            if (!cardElement) return;
             
-            if (targetReading && targetDesired) {
-                let card = targetReading.closest('.card');
-                let titleElement = card.querySelector('h3');
-                let toggle = card.querySelector('.sensor-toggle');
-                
-                // Fetch live reading
-                let liveVal = (sensor.live !== "" && sensor.live !== null) ? sensor.live : "--";
-                targetReading.textContent = "Reading: " + liveVal;
-                
-                if (card.dataset.locked === "true") return; // Ignore updates while card is locked
-                
-                // Fetch desired value
-                let desiredVal = (sensor.desired_value !== "" && sensor.desired_value !== null) ? sensor.desired_value : "";
-                titleElement.dataset.desired = desiredVal;
-                targetDesired.textContent = "Desired: " + (desiredVal !== "" ? desiredVal : "--");
-                
-                // Convert Pin assignment to String
-                let parsedPin = parseInt(sensor.out_pin, 10);
-                titleElement.dataset.pin = (!isNaN(parsedPin)) ? String(parsedPin) : "";
-                
-                // Toggle state
-                let isEnabled = (sensor.enable == 1);
-                toggle.checked = isEnabled;
-            }
+            let card = cardElement.closest('.card');
+            let targetReading = card.querySelector('.card-text p:nth-of-type(1)');
+            let targetDesired = card.querySelector('.desired-display');
+            let toggle = card.querySelector('.sensor-toggle');
+            
+            // Fetch live reading
+            let liveVal = (sensor.live !== "" && sensor.live !== null) ? sensor.live : "--";
+            targetReading.textContent = "Reading: " + liveVal;
+            
+            if (card.dataset.locked === "true") return; 
+            
+            // Fetch desired value
+            let desiredVal = (sensor.desired_value !== "" && sensor.desired_value !== null) ? sensor.desired_value : "";
+            cardElement.dataset.desired = desiredVal;
+            targetDesired.textContent = "Desired: " + (desiredVal !== "" ? desiredVal : "--");
+            
+            // Convert Pin assignment
+            let parsedPin = parseInt(sensor.out_pin, 10);
+            cardElement.dataset.pin = (!isNaN(parsedPin)) ? String(parsedPin) : "";
+            
+            // Toggle state
+            let isEnabled = (sensor.enable == 1);
+            toggle.checked = isEnabled;
         });
     } catch (error) {
         console.error("Error fetching Google Sheets data:", error);
@@ -96,29 +94,16 @@ async function fetchLiveSensorData() {
 
 setInterval(fetchLiveSensorData, 4000); 
 
-// 2. WRITE TO GOOGLE SHEETS
+// 2. WRITE TO GOOGLE SHEETS (Using GET to bypass CORS)
 function updateGoogleSheet(pin, enable, typeName, out_pin, desired) {
     if (GOOGLE_APP_SCRIPT_URL === "YOUR_WEB_APP_URL_HERE") return;
     
     let typeVal = REVERSE_TYPE_MAP[typeName] || "";
     let parsedOutPin = out_pin ? parseInt(out_pin, 10) : ""; 
     
-    const payload = {
-        action: "write",
-        pin: pin,
-        enable: enable,
-        type: typeVal,
-        out_pin: parsedOutPin,
-        desired: desired
-    };
-
-    fetch(GOOGLE_APP_SCRIPT_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams(payload)
-    }).catch(err => console.error("Error writing to Google Sheets:", err));
+    let url = `${GOOGLE_APP_SCRIPT_URL}?action=write&pin=${pin}&enable=${enable}&type=${typeVal}&out_pin=${parsedOutPin}&desired=${desired}`;
+    
+    fetch(url).catch(err => console.error("Error writing to Google Sheets:", err));
 }
 
 // =========================================
@@ -146,7 +131,6 @@ cards.forEach(card => {
         activeCardTitle = this.querySelector('h3');
         desiredInput.value = activeCardTitle.dataset.desired || "";
         
-        // Grey-out logic for used pins
         const allTitles = document.querySelectorAll('.card h3');
         const usedPins = [];
         
@@ -177,7 +161,6 @@ sensorToggles.forEach(toggle => {
         const pinNumber = title.dataset.id; 
         const isEnabled = this.checked ? 1 : 0;
         
-        // Lock card to prevent bouncing
         card.dataset.locked = "true";
         setTimeout(() => { card.dataset.locked = "false"; }, 10000);
         
@@ -190,7 +173,7 @@ cancelBtn.addEventListener('click', () => {
 });
 
 saveBtn.addEventListener('click', () => {
-    if (!activeCardTitle) return; // Safety check
+    if (!activeCardTitle) return; 
 
     const card = activeCardTitle.closest('.card');
     const toggle = card.querySelector('.sensor-toggle');
